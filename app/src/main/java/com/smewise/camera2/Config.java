@@ -22,7 +22,7 @@ public class Config {
     }
 
     public static boolean ratioMatched(Size size) {
-        return size.getWidth() * 3 == size.getHeight() * 4;
+        return size.getWidth() * 9 == size.getHeight() * 16;    // 预览的分辨率设置成 9:16;
     }
 
     public static boolean videoRatioMatched(Size size) {
