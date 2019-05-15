@@ -30,6 +30,8 @@ public class CameraUtil {
     public static double ASPECT_TOLERANCE = 0.00001;
     public static final String SPLIT_TAG = "x";
 
+    public static final boolean mbUseLargestSize = true;
+
     private static void sortCamera2Size(Size[] sizes) {
         Comparator<Size> comparator = new Comparator<Size>() {
             @Override
@@ -67,10 +69,18 @@ public class CameraUtil {
         Size[] supportSize = map.getOutputSizes(SurfaceTexture.class);
         sortCamera2Size(supportSize);
         for (Size size : supportSize) {
-            if (!Config.ratioMatched(size)) {continue;}
-            if ((size.getHeight() == displaySize.x)
-                    || (size.getWidth() <= displaySize.y && size.getHeight() <= displaySize.x)) {
+            if (!Config.ratioMatched(size)) {
+                continue;
+            }
+
+            if (mbUseLargestSize) {
+      //          if (size.getWidth() == 1920 && size.getHeight() == 1080)
                 return size;
+            } else {
+                if ((size.getHeight() == displaySize.x)
+                        || (size.getWidth() <= displaySize.y && size.getHeight() <= displaySize.x)) {
+                    return size;
+                }
             }
         }
         return supportSize[0];
