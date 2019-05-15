@@ -60,6 +60,7 @@ public class PhotoModule extends CameraModule implements FileSaver.FileListener,
     public void start() {
         String cameraId = getSettings().getGlobalPref(
                 CameraSettings.KEY_CAMERA_ID, mDeviceMgr.getCameraIdList()[0]);
+        Log.d(TAG, "cqd, PhotoModule, mDeviceMgr.setCameraId, cameraId = " + cameraId);
         mDeviceMgr.setCameraId(cameraId);
         mDeviceMgr.openCamera(mainHandler);
         // when module changed , need update listener

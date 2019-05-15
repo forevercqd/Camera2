@@ -82,6 +82,7 @@ public class SingleDeviceManager  extends  DeviceManager{
     private synchronized void openDevice(Handler handler) {
         // no need to check permission, because we check permission in onStart() every time
         try {
+            Log.d(TAG, "cqd, openDevice, cameraManager.openCamera, cameraId = " + mCameraId);
             cameraManager.openCamera(mCameraId, stateCallback, handler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
@@ -99,7 +100,7 @@ public class SingleDeviceManager  extends  DeviceManager{
     private CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
-            Log.d(TAG, "device opened :" + camera.getId());
+            Log.d(TAG, "cqd, openCamera, StateCallback.onOpened, cameraID :" + camera.getId());
             mDevice = camera;
             mCameraEvent.onDeviceOpened(camera);
         }

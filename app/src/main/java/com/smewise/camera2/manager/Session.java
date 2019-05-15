@@ -75,6 +75,7 @@ public abstract class Session {
         try {
             assert manager != null;
             characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
+            Log.d(TAG, "cqd, initCharacteristics, get getCameraCharacteristics");
         } catch (CameraAccessException e) {
             Log.e(TAG, "getCameraCharacteristics error:" + e.getMessage());
         }

@@ -97,6 +97,7 @@ public class DualDeviceManager extends  DeviceManager{
     private synchronized void openDevice(String cameraId, Handler handler) {
         // no need to check permission, because we check permission in onStart() every time
         try {
+            Log.d(TAG, "cqd, openDevice, cameraManager.openCamera, cameraId = " + cameraId);
             cameraManager.openCamera(cameraId, stateCallback, handler);
         } catch (CameraAccessException e) {
             e.printStackTrace();

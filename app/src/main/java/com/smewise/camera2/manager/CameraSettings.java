@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.ImageFormat;
 import android.graphics.Point;
 import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -55,14 +56,18 @@ public class CameraSettings {
 
     private SharedPreferences mSharedPreference;
     private Context mContext;
-    private Point mRealDisplaySize = new Point();
+    private Point mRealDisplaySize = new Point();   // 通过 windowManager.getDefaultDisplay().getRealSize 获取的窗口的尺寸，最终显示时关键是　surface　与　铺在 surface 上的图片的分辨率，　如果surface与图片的分辨率不一致时则会变形;
 
     public CameraSettings(Context context) {
         PreferenceManager.setDefaultValues(context, R.xml.camera_setting, false);
         mSharedPreference = PreferenceManager.getDefaultSharedPreferences(context);
         WindowManager windowManager = (WindowManager) context.getSystemService(Context
                 .WINDOW_SERVICE);
+        Log.d(TAG, "cqd, CameraSettings, mRealDisplaySize = " + mRealDisplaySize.x + " x " + mRealDisplaySize.y);
         windowManager.getDefaultDisplay().getRealSize(mRealDisplaySize);
+        Log.d(TAG, "cqd, CameraSettings, mRealDisplaySize = " + mRealDisplaySize.x + " x " + mRealDisplaySize.y);
+
+        getSupportInfo(context);
         mContext = context;
     }
 
@@ -216,22 +221,24 @@ public class CameraSettings {
 
     public String getSupportInfo(Context context) {
         StringBuilder builder = new StringBuilder();
-        DeviceManager deviceManager = new DeviceManager(context);
+        DeviceManager deviceManager = new DeviceManager(context);   // cqd.note.1 获取　DeviceManger
         String[] idList = deviceManager.getCameraIdList();
         String splitLine = "- - - - - - - - - -";
         builder.append(splitLine).append("\n");
-        for (String cameraId : idList) {
+        for (String cameraId : idList) {    // cqd.note.2 遍历各摄像头
             builder.append("Camera ID: ").append(cameraId).append("\n");
             // hardware support level
-            CameraCharacteristics c = deviceManager.getCharacteristics(cameraId);
-            Integer level = c.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+            CameraCharacteristics c = deviceManager.getCharacteristics(cameraId);   // cqd.note.3 获取该摄像头的　character　;
+            Integer level = c.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);     // cqd.note.4　获取 INFO_SUPPORTED_HARDWARE_LEVEL 信息;
+            Log.d(TAG, "cqd, getSupportInfo,  cameraId = " + cameraId + ", INFO_SUPPORTED_HARDWARE_LEVEL, level = " + level);
             builder.append("Hardware Support Level:").append("\n");
             builder.append(CameraUtil.hardwareLevel2Sting(level)).append("\n");
             builder.append("(LEGACY < LIMITED < FULL < LEVEL_3)").append("\n");
             // Capabilities
             builder.append("Camera Capabilities:").append("\n");
-            int[] caps = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
+            int[] caps = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);   // cqd.note.5　获取 REQUEST_AVAILABLE_CAPABILITIES 信息;
             for (int cap : caps) {
+                Log.d(TAG, "cqd, getSupportInfo,  cameraId = " + cameraId + ", REQUEST_AVAILABLE_CAPABILITIES, cap = " + cap);
                 builder.append(CameraUtil.capabilities2String(cap)).append(" ");
             }
             builder.append("\n");

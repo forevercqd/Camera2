@@ -169,8 +169,10 @@ public class CameraSession extends Session {
         mTexture = texture;
         mSurface = new Surface(mTexture);
         try {
+            Log.d(TAG, "cqd, createPreviewSession, before cameraDevice.createCaptureSession");
             cameraDevice.createCaptureSession(setOutputSize(cameraDevice.getId(), mTexture),
                     sessionStateCb, mMainHandler);
+            Log.d(TAG, "cqd, createPreviewSession, after cameraDevice.createCaptureSession");
         } catch (CameraAccessException | IllegalStateException e) {
             e.printStackTrace();
         }
@@ -246,6 +248,7 @@ public class CameraSession extends Session {
     private CaptureRequest.Builder getPreviewBuilder() {
         if (mPreviewBuilder == null) {
             mPreviewBuilder = createBuilder(CameraDevice.TEMPLATE_PREVIEW, mSurface);
+            Log.d(TAG, "cqd, getPreviewBuilder, createCaptureRequest TEMPLATE_PREVIEW");
         }
         return mPreviewBuilder;
     }
@@ -270,10 +273,13 @@ public class CameraSession extends Session {
         String preKey = CameraSettings.KEY_PREVIEW_SIZE;
         String formatKey = CameraSettings.KEY_PICTURE_FORMAT;
         // get value from setting
-        int format = cameraSettings.getPicFormat(id, formatKey);
+        int format = cameraSettings.getPicFormat(id, formatKey);    // cqd.note 获取　JPEG　格式对应的 int 值;
         Size previewSize = cameraSettings.getPreviewSize(id, preKey, map);
-        texture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
+        texture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());  // cqd.note 设置预览分辨率
         Size pictureSize = cameraSettings.getPictureSize(id, picKey, map, format);
+
+        Log.d(TAG, "cqd, setOutputSize, previewSize = " + previewSize.getWidth() + " x " + previewSize.getHeight() +
+                ", pictureSize = " + pictureSize.getWidth() + " x " + pictureSize.getHeight());
         // config surface
         Surface surface = new Surface(texture);
         if (mImageReader != null) {

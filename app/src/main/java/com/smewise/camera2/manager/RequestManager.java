@@ -49,6 +49,7 @@ public class RequestManager {
             mMeteringArea[0] = metering;
         }
         if (isMeteringSupport(true)) {
+            Log.d(TAG, "cqd, getTouch2FocusRequest, set CONTROL_AF_REGIONS");
             builder.set(CaptureRequest.CONTROL_AF_REGIONS, mFocusArea);
         }
         if (isMeteringSupport(false)) {
@@ -60,10 +61,12 @@ public class RequestManager {
 
     public CaptureRequest getFocusModeRequest(CaptureRequest.Builder builder, int focusMode) {
         int afMode = getValidAFMode(focusMode);
-        builder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
+        builder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO); // cqd.note 哪里恢复手动对焦后的结果
         builder.set(CaptureRequest.CONTROL_AF_MODE, afMode);
         builder.set(CaptureRequest.CONTROL_AF_REGIONS, mResetRect);
         builder.set(CaptureRequest.CONTROL_AE_REGIONS, mResetRect);
+
+        Log.d(TAG, "cqd, getFocusModeRequest, set CONTROL_AF_REGIONS");
         // cancel af trigger
         builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
         return builder.build();

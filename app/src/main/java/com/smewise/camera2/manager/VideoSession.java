@@ -201,6 +201,7 @@ public class VideoSession extends Session {
         mTexture = texture;
         mSurface = new Surface(mTexture);
         try {
+            Log.d(TAG, "cqd, createPreviewSession, before cameraDevice.createCaptureSession");
             cameraDevice.createCaptureSession(setPreviewOutputSize(cameraDevice.getId(), mTexture),
                     sessionStateCb, mMainHandler);
         } catch (CameraAccessException | IllegalStateException e) {
@@ -216,6 +217,7 @@ public class VideoSession extends Session {
         }
         setUpMediaRecorder(deviceRotation);
         try {
+            Log.d(TAG, "cqd, createVideoSession, before cameraDevice.createCaptureSession");
             cameraDevice.createCaptureSession(setVideoOutputSize(
                     mTexture, mMediaRecorder.getSurface()), videoSessionStateCb, mMainHandler);
         } catch (CameraAccessException | IllegalStateException e) {
@@ -268,6 +270,7 @@ public class VideoSession extends Session {
         }
         if (mPreviewBuilder == null) {
             mPreviewBuilder = createBuilder(CameraDevice.TEMPLATE_PREVIEW, mSurface);
+            Log.d(TAG, "cqd, getPreviewBuilder, createCaptureRequest TEMPLATE_PREVIEW");
         }
         return mPreviewBuilder;
     }
