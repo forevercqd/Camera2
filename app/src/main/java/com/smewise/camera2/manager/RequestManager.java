@@ -24,7 +24,7 @@ public class RequestManager {
     }
 
     public CaptureRequest getPreviewRequest(CaptureRequest.Builder builder) {
-        int afMode = getValidAFMode(CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE); // cqd.question 此处可以认真分析下 CONTROL_AF_MODE_CONTINUOUS_PICTURE 与 CONTROL_AF_MODE_CONTINUOUS_VIDEO 等其它参数的区别;
+        int afMode = getValidAFMode(CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO); // cqd.note 使用 CONTROL_AF_MODE_CONTINUOUS_PICTURE 时预览会出现花面有闪烁现象
         int antiBMode = getValidAntiBandingMode(CaptureRequest.CONTROL_AE_ANTIBANDING_MODE_AUTO);
         builder.set(CaptureRequest.CONTROL_AF_MODE, afMode);
         builder.set(CaptureRequest.CONTROL_AE_ANTIBANDING_MODE, antiBMode);
