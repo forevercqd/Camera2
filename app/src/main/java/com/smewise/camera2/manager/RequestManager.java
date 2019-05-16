@@ -24,12 +24,14 @@ public class RequestManager {
     }
 
     public CaptureRequest getPreviewRequest(CaptureRequest.Builder builder) {
-        int afMode = getValidAFMode(CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+        int afMode = getValidAFMode(CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE); // cqd.question 此处可以认真分析下 CONTROL_AF_MODE_CONTINUOUS_PICTURE 与 CONTROL_AF_MODE_CONTINUOUS_VIDEO 等其它参数的区别;
         int antiBMode = getValidAntiBandingMode(CaptureRequest.CONTROL_AE_ANTIBANDING_MODE_AUTO);
         builder.set(CaptureRequest.CONTROL_AF_MODE, afMode);
         builder.set(CaptureRequest.CONTROL_AE_ANTIBANDING_MODE, antiBMode);
         builder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
         builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
+
+        Log.d(TAG, "cqd, getPreviewRequest, afMode = " + afMode);
         return builder.build();
     }
 
@@ -38,6 +40,8 @@ public class RequestManager {
         int afMode = getValidAFMode(CaptureRequest.CONTROL_AF_MODE_AUTO);
         builder.set(CaptureRequest.CONTROL_AF_MODE, afMode);
         builder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
+
+        Log.d(TAG, "cqd, getTouch2FocusRequest, afMode = " + afMode);
         if (mFocusArea == null) {
             mFocusArea = new MeteringRectangle[] {focus};
         } else {
@@ -66,7 +70,7 @@ public class RequestManager {
         builder.set(CaptureRequest.CONTROL_AF_REGIONS, mResetRect);
         builder.set(CaptureRequest.CONTROL_AE_REGIONS, mResetRect);
 
-        Log.d(TAG, "cqd, getFocusModeRequest, set CONTROL_AF_REGIONS");
+        Log.d(TAG, "cqd, getFocusModeRequest, afMode = " + afMode);
         // cancel af trigger
         builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
         return builder.build();
@@ -81,6 +85,8 @@ public class RequestManager {
         int afMode = getValidAFMode(CaptureRequest.CONTROL_AF_MODE_OFF);
             // preview
         builder.set(CaptureRequest.CONTROL_AF_MODE, afMode);
+
+        Log.d(TAG, "cqd, getFocusDistanceRequest, afMode = " + afMode);
         float miniDistance = getMinimumDistance();
         if (miniDistance > 0) {
             builder.set(CaptureRequest.LENS_FOCUS_DISTANCE, miniDistance * distance);
@@ -153,6 +159,7 @@ public class RequestManager {
     /* ------------------------- private function------------------------- */
     private int getValidAFMode(int targetMode) {
         int[] allAFMode = mCharacteristics.get(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES);
+        Log.d(TAG, "cqd, getValidAntiBandingMode CONTROL_AF_AVAILABLE_MODES");
         for (int mode : allAFMode) {
             if (mode == targetMode) {
                 return targetMode;
@@ -165,6 +172,8 @@ public class RequestManager {
     private int getValidAntiBandingMode(int targetMode) {
         int[] allABMode = mCharacteristics.get(
                 CameraCharacteristics.CONTROL_AE_AVAILABLE_ANTIBANDING_MODES);
+
+        Log.d(TAG, "cqd, getValidAntiBandingMode CONTROL_AE_AVAILABLE_ANTIBANDING_MODES");
         for (int mode : allABMode) {
             if (mode == targetMode) {
                 return targetMode;

@@ -169,10 +169,10 @@ public class CameraSession extends Session {
         mTexture = texture;
         mSurface = new Surface(mTexture);
         try {
-            Log.d(TAG, "cqd, createPreviewSession, before cameraDevice.createCaptureSession");
+            Log.d(TAG, "cqd, createPreviewSession, cameraDevice.createCaptureSession begin");
             cameraDevice.createCaptureSession(setOutputSize(cameraDevice.getId(), mTexture),
                     sessionStateCb, mMainHandler);
-            Log.d(TAG, "cqd, createPreviewSession, after cameraDevice.createCaptureSession");
+            Log.d(TAG, "cqd, createPreviewSession, cameraDevice.createCaptureSession finish");
         } catch (CameraAccessException | IllegalStateException e) {
             e.printStackTrace();
         }
@@ -183,10 +183,11 @@ public class CameraSession extends Session {
         if (mOriginPreviewRequest == null) {
             mOriginPreviewRequest = request;
         }
+        Log.d(TAG, "cqd, sendPreviewRequest, call sendRepeatingRequest mPreviewCallback");
         sendRepeatingRequest(request, mPreviewCallback, mMainHandler);
     }
 
-    private void sendControlAfAeRequest(MeteringRectangle focusRect,
+    private void sendControlAfAeRequest(MeteringRectangle focusRect,    // cqd.note 该函数是创建
                                         MeteringRectangle meteringRect) {
         CaptureRequest.Builder builder = getPreviewBuilder();
         CaptureRequest request = mRequestMgr
@@ -214,6 +215,8 @@ public class CameraSession extends Session {
         builder.set(CaptureRequest.FLASH_MODE, flashMode);
         CaptureRequest request = mRequestMgr.getStillPictureRequest(
                 getCaptureBuilder(false, mImageReader.getSurface()), jpegRotation);
+
+        Log.d(TAG, "cqd, sendStillPictureRequest, afMode = " + afMode);
         sendCaptureRequestWithStop(request, mCaptureCallback, mMainHandler);
     }
 
@@ -239,6 +242,7 @@ public class CameraSession extends Session {
         mState = STATE_PREVIEW;
         CaptureRequest.Builder builder = getPreviewBuilder();
         builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
+        Log.d(TAG, "cqd, resetTriggerState, set CONTROL_AF_TRIGGER_IDLE");  // 清除对焦请求,否则将将连续不断对焦
         builder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
                 CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_IDLE);
         sendRepeatingRequest(builder.build(), mPreviewCallback, mMainHandler);
@@ -286,11 +290,14 @@ public class CameraSession extends Session {
             mImageReader.close();
             mImageReader = null;
         }
+
+        Log.d(TAG, "cqd, setOutputSize, create ImageReader");
         mImageReader = ImageReader.newInstance(pictureSize.getWidth(),
                 pictureSize.getHeight(), format, 1);
         mImageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
             @Override
             public void onImageAvailable(ImageReader reader) {
+                Log.d(TAG, "cqd, OnImageAvailableListener, onImageAvailable enter.");
                 mCallback.onDataBack(getByteFromReader(reader),
                         reader.getWidth(), reader.getHeight());
             }
@@ -301,11 +308,11 @@ public class CameraSession extends Session {
     }
 
     //session callback
-    private CameraCaptureSession.StateCallback sessionStateCb = new CameraCaptureSession
+    private CameraCaptureSession.StateCallback sessionStateCb = new CameraCaptureSession    // cqd.note 监听 CameraCaptureSession 状态
             .StateCallback() {
         @Override
         public void onConfigured(@NonNull CameraCaptureSession session) {
-            Log.d(TAG, " session onConfigured id:" + session.getDevice().getId());
+            Log.d(TAG, "cqd, CameraCaptureSession.StateCallback onConfigured, get CameraCaptureSession,  id:" + session.getDevice().getId());
             cameraSession = session;
             //mHelper.setCameraCaptureSession(cameraSession);
             updateRequestFromSetting();
@@ -314,28 +321,32 @@ public class CameraSession extends Session {
 
         @Override
         public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-            Log.d(TAG, "create session fail id:" + session.getDevice().getId());
+            Log.d(TAG, "cqd, CameraCaptureSession.StateCallback onConfigureFailed, session fail id:" + session.getDevice().getId());
         }
     };
 
-    private CameraCaptureSession.CaptureCallback mPreviewCallback = new CameraCaptureSession
+    private CameraCaptureSession.CaptureCallback mPreviewCallback = new CameraCaptureSession    // cqd.note 监听 TEMPLATE_PREVIEW, 由于该请求发送的是　setRepeatingRequest 请求,故此处会不断的收到 onCaptureCompleted　的请求;
             .CaptureCallback() {
 
         @Override
         public void onCaptureProgressed(@NonNull CameraCaptureSession session, @NonNull
                 CaptureRequest request, @NonNull CaptureResult partialResult) {
+            Log.d(TAG, "cqd, onCaptureProgressed begin.");
             super.onCaptureProgressed(session, request, partialResult);
             updateAfState(partialResult);
             processPreCapture(partialResult);
+            Log.d(TAG, "cqd, onCaptureProgressed end.");
         }
 
         @Override
         public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull
                 CaptureRequest request, @NonNull TotalCaptureResult result) {
+//            Log.d(TAG, "cqd, onCaptureCompleted begin.");
             super.onCaptureCompleted(session, request, result);
             updateAfState(result);
             processPreCapture(result);
             mCallback.onRequestComplete();
+//            Log.d(TAG, "cqd, onCaptureCompleted end.");
         }
 
         @Override
@@ -359,7 +370,7 @@ public class CameraSession extends Session {
         public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull
                 CaptureRequest request, @NonNull TotalCaptureResult result) {
             super.onCaptureCompleted(session, request, result);
-            Log.i(TAG, "capture complete");
+            Log.i(TAG, "cqd, mCaptureCallback, onCaptureCompleted");
             resetTriggerState();
         }
     };

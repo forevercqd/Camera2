@@ -7,6 +7,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.MeteringRectangle;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -131,9 +132,11 @@ public class PhotoModule extends CameraModule implements FileSaver.FileListener,
     }
 
     private void takePicture() {
+        Log.d(TAG, "cqd, takePicture begin");
         mUI.setUIClickable(false);
         getBaseUI().setUIClickable(false);
         mSession.applyRequest(Session.RQ_TAKE_PICTURE, getToolKit().getOrientation());
+        Log.d(TAG, "cqd, takePicture end");
     }
 
     /**
@@ -183,10 +186,13 @@ public class PhotoModule extends CameraModule implements FileSaver.FileListener,
         @Override
         public void onTouchToFocus(float x, float y) {
             // close all menu when touch to focus
+            Log.d(TAG, "cqd, onTouchToFocus, x = " + x + ", y = " + y);
             mCameraMenu.close();
             mFocusManager.startFocus(x, y);
             MeteringRectangle focusRect = mFocusManager.getFocusArea(x, y, true);
             MeteringRectangle meterRect = mFocusManager.getFocusArea(x, y, false);
+
+            Log.d(TAG, "cqd, onTouchToFocus, mSession.applyRequest, Session.RQ_AF_AE_REGIONS");
             mSession.applyRequest(Session.RQ_AF_AE_REGIONS, focusRect, meterRect);
         }
 
@@ -195,6 +201,7 @@ public class PhotoModule extends CameraModule implements FileSaver.FileListener,
             if (stateEnabled(Controller.CAMERA_MODULE_RUNNING)) {
                 mSession.applyRequest(Session.RQ_FOCUS_MODE,
                         CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                Log.d(TAG, "cqd, resetTouchToFocus, set afMode CONTROL_AF_MODE_CONTINUOUS_PICTURE = " + CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
             }
         }
 

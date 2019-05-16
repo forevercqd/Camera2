@@ -4,6 +4,11 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.hardware.camera2.CameraCharacteristics;
+import android.nfc.Tag;
+import android.util.Log;
+
+import com.smewise.camera2.Config;
+import com.smewise.camera2.manager.FocusOverlayManager;
 
 /**
  * Transform coordinates to and from preview coordinate space and camera driver
@@ -13,6 +18,7 @@ public class CoordinateTransformer {
 
     private final Matrix mPreviewToCameraTransform;
     private RectF mDriverRectF;
+    private final String TAG = Config.getTag(CoordinateTransformer.class);
 
     /**
      * Convert rectangles to / from camera coordinate and preview coordinate space.
@@ -24,6 +30,9 @@ public class CoordinateTransformer {
             throw new IllegalArgumentException("previewRect");
         }
         Rect rect = chr.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+        Log.d(TAG, "cqd, CoordinateTransformer, SENSOR_INFO_ACTIVE_ARRAY_SIZE, rect{left = " + rect.left +
+                ", right = " + rect.right + ", top = " + rect.top + ", bottom = " + rect.bottom);
+
         Integer sensorOrientation = chr.get(CameraCharacteristics.SENSOR_ORIENTATION);
         int rotation = sensorOrientation == null ? 90 : sensorOrientation;
         mDriverRectF = new RectF(rect);

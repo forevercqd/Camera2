@@ -98,8 +98,9 @@ public abstract class Session {
 
     CaptureRequest.Builder createBuilder(int type, Surface surface) {
         try {
-            CaptureRequest.Builder builder = cameraDevice.createCaptureRequest(type);
+            CaptureRequest.Builder builder = cameraDevice.createCaptureRequest(type);  // 创建　CaptureRequest.Builder,　其中参数可能为 TEMPLATE_PREVIEW（预览）, TEMPLATE_RECORD(视频录制), TEMPLATE_STILL_CAPTURE(拍照);
             builder.addTarget(surface);
+            Log.d(TAG, "cqd, createBuilder, cameraDevice.createCaptureRequest CaptureRequest.Builder, and addTarget surface = " + surface +", type = " + type);
             return builder;
         } catch (CameraAccessException | IllegalStateException e) {
             e.printStackTrace();
@@ -109,7 +110,8 @@ public abstract class Session {
     void sendRepeatingRequest(CaptureRequest request,
                                       CameraCaptureSession.CaptureCallback callback, Handler handler) {
         try {
-            cameraSession.setRepeatingRequest(request, callback, handler);
+            Log.d(TAG, "cqd, cameraSession.setRepeatingRequest");
+            cameraSession.setRepeatingRequest(request, callback, handler);  // cqd.note 反复发送　TEMPLATE_PREVIEW 请求, 并且有　callback 监听该请求的回调结果;
         } catch (CameraAccessException | IllegalStateException e) {
             Log.e(TAG, "send repeating request error:" + e.getMessage());
         }
@@ -118,6 +120,7 @@ public abstract class Session {
     void sendCaptureRequest(CaptureRequest request,
                                     CameraCaptureSession.CaptureCallback callback, Handler handler) {
         try {
+            Log.d(TAG, "cqd, sendCaptureRequest, cameraSession.capture triger focus");
             cameraSession.capture(request, callback, handler);
         } catch (CameraAccessException | IllegalStateException e) {
             Log.e(TAG, "send capture request error:" + e.getMessage());
@@ -127,8 +130,10 @@ public abstract class Session {
     void sendCaptureRequestWithStop(CaptureRequest request,
                             CameraCaptureSession.CaptureCallback callback, Handler handler) {
         try {
-            cameraSession.stopRepeating();
+            Log.d(TAG, "cqd, sendCaptureRequestWithStop, call cameraSession.stopRepeating()");
+            cameraSession.stopRepeating();  // cqd.note 实现停止捕获图像，即停止预览。
             cameraSession.abortCaptures();
+            Log.d(TAG, "cqd, sendCaptureRequestWithStop, call cameraSession.capture triger focus");
             cameraSession.capture(request, callback, handler);
         } catch (CameraAccessException | IllegalStateException e) {
             Log.e(TAG, "send capture request error:" + e.getMessage());

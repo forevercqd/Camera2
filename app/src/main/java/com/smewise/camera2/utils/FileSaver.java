@@ -66,6 +66,8 @@ public class FileSaver {
     public void saveFile(int width, int height, int orientation, byte[] data, String tag,
             int saveType) {
         File file = MediaFunc.getOutputMediaFile(saveType, tag);
+        Log.d(TAG, "cqd, getOutputMediaFile, path = " + file.getAbsolutePath());
+
         if (file == null) {
             mHandler.post(new Runnable() {
                 @Override

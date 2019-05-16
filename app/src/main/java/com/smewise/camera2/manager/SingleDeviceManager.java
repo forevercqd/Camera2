@@ -97,11 +97,11 @@ public class SingleDeviceManager  extends  DeviceManager{
         mCameraEvent.onDeviceClosed();
     }
 
-    private CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
+    private CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {   // cqd.note 监听 cameraManager.openCamera 摄像头状态
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
-            Log.d(TAG, "cqd, openCamera, StateCallback.onOpened, cameraID :" + camera.getId());
             mDevice = camera;
+            Log.d(TAG, "cqd, openCamera, StateCallback.onOpened, cameraID :" + camera.getId() + ", setCameraDevice");
             mCameraEvent.onDeviceOpened(camera);
         }
 
