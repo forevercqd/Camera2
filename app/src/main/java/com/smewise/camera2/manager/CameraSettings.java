@@ -236,6 +236,15 @@ public class CameraSettings {
             builder.append("(LEGACY < LIMITED < FULL < LEVEL_3)").append("\n");
             // Capabilities
             builder.append("Camera Capabilities:").append("\n");
+
+            Integer face = c.get(CameraCharacteristics.LENS_FACING);
+            if (CameraCharacteristics.LENS_FACING_FRONT == face){
+                Log.d(TAG, "cqd, getSupportInfo, cameraID = " + cameraId + ", LENS_FACING_FRONT");
+            }else if (CameraCharacteristics.LENS_FACING_BACK == face){
+                Log.d(TAG, "cqd, getSupportInfo, cameraID = " + cameraId + ", LENS_FACING_BACK");
+            }else if (CameraCharacteristics.LENS_FACING_EXTERNAL == face){
+                Log.d(TAG, "cqd, getSupportInfo, cameraID = " + cameraId + ", LENS_FACING_EXTERNAL");
+            }
             int[] caps = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);   // cqd.note.5　获取 REQUEST_AVAILABLE_CAPABILITIES 信息;
             for (int cap : caps) {
                 Log.d(TAG, "cqd, getSupportInfo,  cameraId = " + cameraId + ", REQUEST_AVAILABLE_CAPABILITIES, cap = " + cap);
