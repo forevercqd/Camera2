@@ -29,6 +29,7 @@ public class SingleDeviceManager  extends  DeviceManager{
 
     public void setCameraId(@NonNull String id) {
         mCameraId = id;
+        Log.d(TAG, "cqd, setCameraId = " + mCameraId);
     }
 
     public String getCameraId() {

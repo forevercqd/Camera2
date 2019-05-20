@@ -39,7 +39,7 @@ public class CameraSession extends Session {
 
     private Handler mMainHandler;
     private RequestManager mRequestMgr;
-    private RequestCallback mCallback;
+    private RequestCallback mCallback;  // cqd.note 此处的　mCallback　其实是 mRequestCallback;
     private SurfaceTexture mTexture;
     private Surface mSurface;
     private ImageReader mImageReader;
@@ -179,7 +179,7 @@ public class CameraSession extends Session {
     }
 
     private void sendPreviewRequest() {
-        CaptureRequest request = mRequestMgr.getPreviewRequest(getPreviewBuilder());
+        CaptureRequest request = mRequestMgr.getPreviewRequest(getPreviewBuilder());    // getPreviewBuilder 中创建　TEMPLATE_PREVIEW 对应 CaptureRequest.Builder，同时添加 surface;
         if (mOriginPreviewRequest == null) {
             mOriginPreviewRequest = request;
         }
@@ -251,7 +251,7 @@ public class CameraSession extends Session {
 
     private CaptureRequest.Builder getPreviewBuilder() {
         if (mPreviewBuilder == null) {
-            mPreviewBuilder = createBuilder(CameraDevice.TEMPLATE_PREVIEW, mSurface);
+            mPreviewBuilder = createBuilder(CameraDevice.TEMPLATE_PREVIEW, mSurface); // 有创建　TEMPLATE_PREVIEW 对应 CaptureRequest.Builder，同时添加 surface;
             Log.d(TAG, "cqd, getPreviewBuilder, createCaptureRequest TEMPLATE_PREVIEW");
         }
         return mPreviewBuilder;
@@ -259,9 +259,11 @@ public class CameraSession extends Session {
 
     private CaptureRequest.Builder getCaptureBuilder( boolean create, Surface surface) {
         if (create) {
-            return createBuilder(CameraDevice.TEMPLATE_STILL_CAPTURE, surface);
+            Log.d(TAG, "cqd, getCaptureBuilder, createBuilder, TEMPLATE_STILL_CAPTURE type");
+            return createBuilder(CameraDevice.TEMPLATE_STILL_CAPTURE, surface); // cqd.note 适用于静态图像捕获的请求
         } else {
             if (mCaptureBuilder == null) {
+                Log.d(TAG, "cqd, getCaptureBuilder, createBuilder, TEMPLATE_STILL_CAPTURE type");
                 mCaptureBuilder = createBuilder(CameraDevice.TEMPLATE_STILL_CAPTURE, surface);
             }
             return mCaptureBuilder;
@@ -298,13 +300,13 @@ public class CameraSession extends Session {
             @Override
             public void onImageAvailable(ImageReader reader) {
                 Log.d(TAG, "cqd, OnImageAvailableListener, onImageAvailable enter.");
-                mCallback.onDataBack(getByteFromReader(reader),
+                mCallback.onDataBack(getByteFromReader(reader), // cqd.note 此处的　mCallback　其实是 mRequestCallback;
                         reader.getWidth(), reader.getHeight());
             }
         }, null);
         Size uiSize = CameraUtil.getPreviewUiSize(appContext, previewSize);
         mCallback.onViewChange(uiSize.getHeight(), uiSize.getWidth());
-        return Arrays.asList(surface, mImageReader.getSurface());
+        return Arrays.asList(surface, mImageReader.getSurface());   // cqd.note 此处不设置时会怎么样？
     }
 
     //session callback
@@ -345,6 +347,7 @@ public class CameraSession extends Session {
             super.onCaptureCompleted(session, request, result);
             updateAfState(result);
             processPreCapture(result);
+            Log.d(TAG, "cqd, CameraCaptureSession.CaptureCallback, mCallback = " + mCallback);
             mCallback.onRequestComplete();
 //            Log.d(TAG, "cqd, onCaptureCompleted end.");
         }

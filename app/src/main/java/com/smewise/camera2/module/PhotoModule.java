@@ -76,10 +76,11 @@ public class PhotoModule extends CameraModule implements FileSaver.FileListener,
         @Override
         public void onDeviceOpened(CameraDevice device) {
             super.onDeviceOpened(device);
-            Log.d(TAG, "camera opened");
+            Log.d(TAG, "cqd, camera opened");
             mSession.applyRequest(Session.RQ_SET_DEVICE, device);
             enableState(Controller.CAMERA_STATE_OPENED);
             if (stateEnabled(Controller.CAMERA_STATE_UI_READY)) {
+                Log.d(TAG, "cqd, mRequestCallback = " + mRequestCallback);
                 mSession.applyRequest(Session.RQ_START_PREVIEW, mSurfaceTexture, mRequestCallback);
             }
         }
@@ -98,6 +99,7 @@ public class PhotoModule extends CameraModule implements FileSaver.FileListener,
     private RequestCallback mRequestCallback = new RequestCallback() {
         @Override
         public void onDataBack(byte[] data, int width, int height) {
+            Log.d(TAG, "cqd, RequestCallback, onDataBack");
             super.onDataBack(data, width, height);
             saveFile(data, width, height, mDeviceMgr.getCameraId(),
                     CameraSettings.KEY_PICTURE_FORMAT, "CAMERA");
@@ -289,6 +291,7 @@ public class PhotoModule extends CameraModule implements FileSaver.FileListener,
 
     private void switchCamera() {
         int currentId = Integer.parseInt(mDeviceMgr.getCameraId());
+        int oldCameraID = currentId;
         int cameraCount = mDeviceMgr.getCameraIdList().length;
         currentId++;
         if (cameraCount < 2) {
@@ -298,6 +301,7 @@ public class PhotoModule extends CameraModule implements FileSaver.FileListener,
             currentId = 0;
         }
         String switchId = String.valueOf(currentId);
+        Log.d(TAG, "cqd, switchCamera, oldCameraID = " + oldCameraID + ", switchId = " + switchId);
         mDeviceMgr.setCameraId(switchId);
         boolean ret = getSettings().setGlobalPref(CameraSettings.KEY_CAMERA_ID, switchId);
         if (ret) {

@@ -20,7 +20,7 @@ public class RequestManager {
     };
 
     public void setCharacteristics(CameraCharacteristics characteristics) {
-        mCharacteristics = characteristics;
+        mCharacteristics = characteristics; // cqd.note 保存当前在运行的 Camera　的　Character　参数;
     }
 
     public CaptureRequest getPreviewRequest(CaptureRequest.Builder builder) {
