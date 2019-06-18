@@ -225,6 +225,14 @@ public class CameraSettings {
         String[] idList = deviceManager.getCameraIdList();
         String splitLine = "- - - - - - - - - -";
         builder.append(splitLine).append("\n");
+
+        Log.d(TAG, "CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY = " + CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY);
+        Log.d(TAG, "CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED = " + CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED);
+        Log.d(TAG, "CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL = " + CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL);
+        Log.d(TAG, "CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_3 = " + CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_3);
+//        Log.d(TAG, "CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_EXTERNAL = " + CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_EXTERNAL);
+
+
         for (String cameraId : idList) {    // cqd.note.2 遍历各摄像头
             builder.append("Camera ID: ").append(cameraId).append("\n");
             // hardware support level

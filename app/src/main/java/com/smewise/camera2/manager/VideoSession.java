@@ -247,11 +247,12 @@ public class VideoSession extends Session {
         sendRepeatingRequest(request, mPreviewCallback, mMainHandler);
         // trigger af
         builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_START);
+        Log.d(TAG, "cqd.focus, sendControlAfAeRequest, Builder set CONTROL_AF_TRIGGER_START");
         sendCaptureRequest(builder.build(), null, mMainHandler);
     }
 
     private void sendControlFocusModeRequest(int focusMode) {
-        Log.d(TAG, "focusMode:" + focusMode);
+        Log.d(TAG, "cqd.focus, sendControlFocusModeRequest, focusMode = " + focusMode);
         CaptureRequest request = mRequestMgr.getFocusModeRequest(getPreviewBuilder(), focusMode);
         sendRepeatingRequest(request, mPreviewCallback, mMainHandler);
     }

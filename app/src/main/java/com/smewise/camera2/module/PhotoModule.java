@@ -190,9 +190,18 @@ public class PhotoModule extends CameraModule implements FileSaver.FileListener,
             // close all menu when touch to focus
             Log.d(TAG, "cqd, onTouchToFocus, x = " + x + ", y = " + y);
             mCameraMenu.close();
-            mFocusManager.startFocus(x, y);
-            MeteringRectangle focusRect = mFocusManager.getFocusArea(x, y, true);
-            MeteringRectangle meterRect = mFocusManager.getFocusArea(x, y, false);
+
+            boolean mFixedFocusPostion = false;
+            if (mFixedFocusPostion) {
+              //  x = 1300;
+                x = 750;
+                y = 1200;
+            }
+
+            Log.d(TAG, "cqd.focus, point = {" + x + ", " + y + "}");
+            mFocusManager.startFocus(x, y);  // cqd.focus
+            MeteringRectangle focusRect = mFocusManager.getFocusArea(x, y, true);   // cqd.focus　通过 mPreviewToCameraTransform 获取对焦的区域
+            MeteringRectangle meterRect = mFocusManager.getFocusArea(x, y, false);  // cqd.focus getFocusArea　中的 true 与 false　分别表示取 mPreviewRect 的 1/5, 1/4 作为该区域的宽与高;
 
             Log.d(TAG, "cqd, onTouchToFocus, mSession.applyRequest, Session.RQ_AF_AE_REGIONS");
             mSession.applyRequest(Session.RQ_AF_AE_REGIONS, focusRect, meterRect);

@@ -110,7 +110,7 @@ public abstract class Session {
     void sendRepeatingRequest(CaptureRequest request,
                                       CameraCaptureSession.CaptureCallback callback, Handler handler) {
         try {
-            Log.d(TAG, "cqd, cameraSession.setRepeatingRequest");
+            Log.d(TAG, "cqd.focus, cameraSession.setRepeatingRequest");
             cameraSession.setRepeatingRequest(request, callback, handler);  // cqd.note 反复发送　TEMPLATE_PREVIEW 请求, 并且有　callback 监听该请求的回调结果;
         } catch (CameraAccessException | IllegalStateException e) {
             Log.e(TAG, "send repeating request error:" + e.getMessage());
@@ -120,7 +120,7 @@ public abstract class Session {
     void sendCaptureRequest(CaptureRequest request,
                                     CameraCaptureSession.CaptureCallback callback, Handler handler) {
         try {
-            Log.d(TAG, "cqd, sendCaptureRequest, cameraSession.capture triger focus");
+            Log.d(TAG, "cqd.focus, sendCaptureRequest, cameraSession.capture triger focus");
             cameraSession.capture(request, callback, handler);
         } catch (CameraAccessException | IllegalStateException e) {
             Log.e(TAG, "send capture request error:" + e.getMessage());
@@ -130,10 +130,10 @@ public abstract class Session {
     void sendCaptureRequestWithStop(CaptureRequest request,
                             CameraCaptureSession.CaptureCallback callback, Handler handler) {
         try {
-            Log.d(TAG, "cqd, sendCaptureRequestWithStop, call cameraSession.stopRepeating()");
+            Log.d(TAG, "cqd, sendCaptureRequestWithStop, call cameraSession.stopRepeating();  cameraSession.abortCaptures();");
             cameraSession.stopRepeating();  // cqd.note 实现停止捕获图像，即停止预览。
             cameraSession.abortCaptures();
-            Log.d(TAG, "cqd, sendCaptureRequestWithStop, call cameraSession.capture triger focus");
+            Log.d(TAG, "cqd.focus, sendCaptureRequestWithStop, call cameraSession.capture triger focus");
             cameraSession.capture(request, callback, handler);
         } catch (CameraAccessException | IllegalStateException e) {
             Log.e(TAG, "send capture request error:" + e.getMessage());

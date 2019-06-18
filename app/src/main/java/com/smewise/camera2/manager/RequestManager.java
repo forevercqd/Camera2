@@ -23,15 +23,15 @@ public class RequestManager {
         mCharacteristics = characteristics; // cqd.note 保存当前在运行的 Camera　的　Character　参数;
     }
 
-    public CaptureRequest getPreviewRequest(CaptureRequest.Builder builder) {
+    public CaptureRequest getPreviewRequest(CaptureRequest.Builder builder) {  // cqd.focus 设置自动模式，其中自动对焦设置成　CONTROL_AF_MODE_CONTINUOUS_VIDEO, 曝光模式设置成　CONTROL_AE_ANTIBANDING_MODE_AUTO, 同时清除之前所有的对焦请求;
         int afMode = getValidAFMode(CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO); // cqd.note 使用 CONTROL_AF_MODE_CONTINUOUS_PICTURE 时预览会出现花面有闪烁现象
         int antiBMode = getValidAntiBandingMode(CaptureRequest.CONTROL_AE_ANTIBANDING_MODE_AUTO);
         builder.set(CaptureRequest.CONTROL_AF_MODE, afMode);
         builder.set(CaptureRequest.CONTROL_AE_ANTIBANDING_MODE, antiBMode);
         builder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
-        builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
+        builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE); // cqd.focus　解除自动对焦模式;
 
-        Log.d(TAG, "cqd, getPreviewRequest, afMode = " + afMode);
+        Log.d(TAG, "cqd.focus, getPreviewRequest, builder set CONTROL_AE_ANTIBANDING_MODE_AUTO,  CONTROL_AF_TRIGGER_IDLE, CONTROL_AF_MODE = CONTROL_AF_MODE_CONTINUOUS_VIDEO");
         return builder.build();
     }
 
@@ -41,7 +41,6 @@ public class RequestManager {
         builder.set(CaptureRequest.CONTROL_AF_MODE, afMode);
         builder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
 
-        Log.d(TAG, "cqd, getTouch2FocusRequest, afMode = " + afMode);
         if (mFocusArea == null) {
             mFocusArea = new MeteringRectangle[] {focus};
         } else {
@@ -52,25 +51,34 @@ public class RequestManager {
         } else {
             mMeteringArea[0] = metering;
         }
-        if (isMeteringSupport(true)) {
+        if (isMeteringSupport(true)) {  //　cqd.focus 返回相机支持的 CONTROL_MAX_REGIONS_AF 对焦的区域的数量
             Log.d(TAG, "cqd, getTouch2FocusRequest, set CONTROL_AF_REGIONS");
             builder.set(CaptureRequest.CONTROL_AF_REGIONS, mFocusArea);
         }
-        if (isMeteringSupport(false)) {
+        if (isMeteringSupport(false)) { // cqd.focus 返回相机支持的 CONTROL_MAX_REGIONS_AE 对焦的区域的数量
             builder.set(CaptureRequest.CONTROL_AE_REGIONS, mMeteringArea);
         }
-        builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
+
+        Log.d(TAG, "cqd.focus, getTouch2FocusRequest, set CONTROL_AE_REGIONS, CONTROL_AF_MODE_AUTO, CONTROL_MODE_AUTO, CONTROL_AE_REGIONS = {"  +
+                mMeteringArea[0].getRect().left + ", " + mMeteringArea[0].getRect().top + ", " + mMeteringArea[0].getRect().right + ", " + mMeteringArea[0].getRect().bottom + "}");
+
+        Log.d(TAG, "cqd.focus, getTouch2FocusRequest, set CONTROL_AE_REGIONS, CONTROL_AF_MODE_AUTO, CONTROL_MODE_AUTO, CONTROL_AF_REGIONS = {"  +
+                mFocusArea[0].getRect().left + ", " + mFocusArea[0].getRect().top + ", " + mFocusArea[0].getRect().right + ", " + mFocusArea[0].getRect().bottom + "}");
+
+        builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);  // cqd.focus 清除对焦请求;
         return builder.build();
     }
 
-    public CaptureRequest getFocusModeRequest(CaptureRequest.Builder builder, int focusMode) {
+    public CaptureRequest getFocusModeRequest(CaptureRequest.Builder builder, int focusMode) {  // cqd.focus 应用对焦模式
         int afMode = getValidAFMode(focusMode);
         builder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO); // cqd.note 哪里恢复手动对焦后的结果
         builder.set(CaptureRequest.CONTROL_AF_MODE, afMode);
         builder.set(CaptureRequest.CONTROL_AF_REGIONS, mResetRect);
         builder.set(CaptureRequest.CONTROL_AE_REGIONS, mResetRect);
 
-        Log.d(TAG, "cqd, getFocusModeRequest, afMode = " + afMode);
+        Log.d(TAG, "cqd.focus, getFocusModeRequest, set CONTROL_AF_REGIONS, CONTROL_AE_REGIONS, CONTROL_AF_MODE = " + afMode + ", CONTROL_AF_REGIONS = {" +
+                mResetRect[0].getRect().left + ", " + mResetRect[0].getRect().top + ", " + mResetRect[0].getRect().right + ", " + mResetRect[0].getRect().bottom + "}");
+
         // cancel af trigger
         builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
         return builder.build();
@@ -122,6 +130,8 @@ public class RequestManager {
                 Log.e(TAG, "error value for flash mode");
                 break;
         }
+
+        Log.d(TAG, "cqd, getFlashRequest, set FlashBuildRequest");
         builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
         return builder.build();
     }

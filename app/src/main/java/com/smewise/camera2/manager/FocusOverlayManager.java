@@ -7,6 +7,7 @@ import android.hardware.camera2.params.MeteringRectangle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 import com.smewise.camera2.Config;
 import com.smewise.camera2.callback.CameraUiEvent;
@@ -51,7 +52,7 @@ public class FocusOverlayManager {
                 return;
             }
             switch (msg.what) {
-                case MSG_HIDE_FOCUS:
+                case MSG_HIDE_FOCUS:    // cqd.focus 其实就是应用前面已经计算好的 CONTROL_AF_REGIONS, CONTROL_AE_REGIONS,同时设置　CONTROL_AF_MODE_CONTINUOUS_PICTURE;
                     mManager.get().mFocusView.resetToDefaultPosition();
                     mManager.get().hideFocusUI();
                     mManager.get().mListener.resetTouchToFocus();
@@ -73,17 +74,20 @@ public class FocusOverlayManager {
 
     public void onPreviewChanged(int width, int height, CameraCharacteristics c) {
         mPreviewRect = new Rect(0, 0, width, height);
-        mTransformer = new CoordinateTransformer(c, rectToRectF(mPreviewRect));
+        mTransformer = new CoordinateTransformer(c, rectToRectF(mPreviewRect)); // cqd.focus 计算　previewRect*dstRect 后的变换矩阵
+
+        Log.d(TAG, "cqd.focus, mPreviewRect = {" + mPreviewRect.left + ", " + mPreviewRect.top + ", " + mPreviewRect.right + ", " + mPreviewRect.bottom + "}");
     }
 
     /* just set focus view position, not start animation*/
-    public void startFocus(float x, float y) {
+    public void startFocus(float x, float y) {  // cqd.focus 先去掉 MSG_HIDE_FOCUS 消息,并更新中心点 currentX, currentY, 同时发送延迟 4s　响应的　MSG_HIDE_FOCUS　消息;
         currentX = x;
         currentY = y;
         mHandler.removeMessages(MSG_HIDE_FOCUS);
         mFocusView.moveToPosition(x, y);
         //mFocusView.startFocus();
-        mHandler.sendEmptyMessageDelayed(MSG_HIDE_FOCUS, HIDE_FOCUS_DELAY);
+        Log.d(TAG, "cqd, startFocus, sendEmptyMessageDelayed(MSG_HIDE_FOCUS, 4000)");
+        mHandler.sendEmptyMessageDelayed(MSG_HIDE_FOCUS, HIDE_FOCUS_DELAY); // cqd.focus
     }
     /* show focus view by af state */
     public void startFocus() {
@@ -120,7 +124,7 @@ public class FocusOverlayManager {
         currentX = x;
         currentY = y;
         if (isFocusArea) {
-            return calcTapAreaForCamera2(mPreviewRect.width() / 5, 1000);
+            return calcTapAreaForCamera2(mPreviewRect.width() / 5, 1000);   // cqd.focus 此处
         } else {
             return calcTapAreaForCamera2(mPreviewRect.width() / 4, 1000);
         }
@@ -132,7 +136,9 @@ public class FocusOverlayManager {
         int top = clamp((int) currentY - areaSize / 2,
                 mPreviewRect.top, mPreviewRect.bottom - areaSize);
         RectF rectF = new RectF(left, top, left + areaSize, top + areaSize);
-        toFocusRect(mTransformer.toCameraSpace(rectF));
+        toFocusRect(mTransformer.toCameraSpace(rectF)); // cqd.focus 将 rectF 使用 mPreviewToCameraTransform 变换后的结果，进一步转换成 int , 并保存至 FocusOverlayManager::mFocusRect 中;
+
+        Log.d(TAG, "cqd.focus, calcTapAreaForCamera2, calculate Focus Area, mFocusRect = {" + mFocusRect.left + ", " + mFocusRect.top + ", " + mFocusRect.right + ", " + mFocusRect.bottom + "}");
         return new MeteringRectangle(mFocusRect, weight);
     }
 

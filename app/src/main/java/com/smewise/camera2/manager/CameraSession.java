@@ -137,6 +137,7 @@ public class CameraSession extends Session {
     @Override
     public void release() {
         if (cameraSession != null) {
+            Log.d(TAG, "cqd, release, call cameraSession.close()");
             cameraSession.close();
             cameraSession = null;
         }
@@ -190,16 +191,16 @@ public class CameraSession extends Session {
     private void sendControlAfAeRequest(MeteringRectangle focusRect,    // cqd.note 该函数是创建
                                         MeteringRectangle meteringRect) {
         CaptureRequest.Builder builder = getPreviewBuilder();
-        CaptureRequest request = mRequestMgr
-                .getTouch2FocusRequest(builder, focusRect, meteringRect);
+        CaptureRequest request = mRequestMgr.getTouch2FocusRequest(builder, focusRect, meteringRect);   // cqd.focus 设置对焦区域，并清除已有的对焦请求;
         sendRepeatingRequest(request, mPreviewCallback, mMainHandler);
         // trigger af
         builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_START);
-        sendCaptureRequest(builder.build(), null, mMainHandler);
+        Log.d(TAG, "cqd.focus, sendControlAfAeRequest, CONTROL_AF_TRIGGER_START");
+        sendCaptureRequest(builder.build(), null, mMainHandler);        // cqd.queston.1 此处是什么作用？
     }
 
     private void sendControlFocusModeRequest(int focusMode) {
-        Log.d(TAG, "focusMode:" + focusMode);
+        Log.d(TAG, "cqd.focus, sendControlFocusModeRequest, focusMode = " + focusMode);
         CaptureRequest request = mRequestMgr.getFocusModeRequest(getPreviewBuilder(), focusMode);
         sendRepeatingRequest(request, mPreviewCallback, mMainHandler);
     }
@@ -242,9 +243,10 @@ public class CameraSession extends Session {
         mState = STATE_PREVIEW;
         CaptureRequest.Builder builder = getPreviewBuilder();
         builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
-        Log.d(TAG, "cqd, resetTriggerState, set CONTROL_AF_TRIGGER_IDLE");  // 清除对焦请求,否则将将连续不断对焦
         builder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
                 CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_IDLE);
+
+        Log.d(TAG, "cqd.focus, resetTriggerState, builder set CONTROL_AF_TRIGGER, CONTROL_AE_PRECAPTURE_TRIGGER");  // 清除对焦请求,否则将将连续不断对焦
         sendRepeatingRequest(builder.build(), mPreviewCallback, mMainHandler);
         sendCaptureRequest(builder.build(), mPreviewCallback, mMainHandler);
     }
@@ -284,8 +286,8 @@ public class CameraSession extends Session {
         texture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());  // cqd.note 设置预览分辨率
         Size pictureSize = cameraSettings.getPictureSize(id, picKey, map, format);
 
-        Log.d(TAG, "cqd, setOutputSize, previewSize = " + previewSize.getWidth() + " x " + previewSize.getHeight() +
-                ", pictureSize = " + pictureSize.getWidth() + " x " + pictureSize.getHeight());
+        Log.d(TAG, "cqd, setOutputSize, width = " + previewSize.getWidth() + " x " + previewSize.getHeight() +
+                ", height = " + pictureSize.getWidth() + " x " + pictureSize.getHeight());
         // config surface
         Surface surface = new Surface(texture);
         if (mImageReader != null) {
@@ -299,9 +301,10 @@ public class CameraSession extends Session {
         mImageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
             @Override
             public void onImageAvailable(ImageReader reader) {
-                Log.d(TAG, "cqd, OnImageAvailableListener, onImageAvailable enter.");
+                Log.d(TAG, "cqd capture, OnImageAvailableListener, onImageAvailable begin.");
                 mCallback.onDataBack(getByteFromReader(reader), // cqd.note 此处的　mCallback　其实是 mRequestCallback;
                         reader.getWidth(), reader.getHeight());
+                Log.d(TAG, "cqd capture, OnImageAvailableListener, onImageAvailable end.");
             }
         }, null);
         Size uiSize = CameraUtil.getPreviewUiSize(appContext, previewSize);
@@ -314,7 +317,7 @@ public class CameraSession extends Session {
             .StateCallback() {
         @Override
         public void onConfigured(@NonNull CameraCaptureSession session) {
-            Log.d(TAG, "cqd, CameraCaptureSession.StateCallback onConfigured, get CameraCaptureSession,  id:" + session.getDevice().getId());
+            Log.d(TAG, "cqd, CameraCaptureSession.StateCallback onConfigured, set cameraSession, get CameraCaptureSession,  id:" + session.getDevice().getId());
             cameraSession = session;
             //mHelper.setCameraCaptureSession(cameraSession);
             updateRequestFromSetting();
@@ -347,7 +350,7 @@ public class CameraSession extends Session {
             super.onCaptureCompleted(session, request, result);
             updateAfState(result);
             processPreCapture(result);
-            Log.d(TAG, "cqd, CameraCaptureSession.CaptureCallback, mCallback = " + mCallback);
+            Log.d(TAG, "cqd, mPreviewCallback, onCaptureCompleted, mCallback = " + mCallback);
             mCallback.onRequestComplete();
 //            Log.d(TAG, "cqd, onCaptureCompleted end.");
         }
@@ -373,7 +376,7 @@ public class CameraSession extends Session {
         public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull
                 CaptureRequest request, @NonNull TotalCaptureResult result) {
             super.onCaptureCompleted(session, request, result);
-            Log.i(TAG, "cqd, mCaptureCallback, onCaptureCompleted");
+            Log.i(TAG, "cqd mCaptureCallback, mCaptureCallback, onCaptureCompleted");
             resetTriggerState();
         }
     };
@@ -388,7 +391,7 @@ public class CameraSession extends Session {
                 Integer afState = result.get(CaptureResult.CONTROL_AF_STATE);
                 if (afState == null) {
                     sendStillPictureRequest();
-                } else if (CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED == afState ||
+                } else if (CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED == afState ||  // cqd.note 对焦完成
                         CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED == afState) {
                     // CONTROL_AE_STATE can be null on some devices
                     Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
@@ -437,6 +440,8 @@ public class CameraSession extends Session {
         builder.set(CaptureRequest.CONTROL_AF_TRIGGER,
                 CaptureRequest.CONTROL_AF_TRIGGER_START);
         mState = STATE_WAITING_LOCK;
+
+        Log.d(TAG, "cqd.focus, build set and send CONTROL_AF_TRIGGER_START");
         sendCaptureRequest(builder.build(), mPreviewCallback, mMainHandler);
     }
 
@@ -454,6 +459,7 @@ public class CameraSession extends Session {
     private void updateAfState(CaptureResult result) {
         Integer state = result.get(CaptureResult.CONTROL_AF_STATE);
         if (state != null && mLatestAfState != state) {
+            Log.d(TAG, "cqd.focus, updateAfState, mLatestAfState = " + mLatestAfState + ", state = " + state);
             mLatestAfState = state;
             mCallback.onAFStateChanged(state);
         }

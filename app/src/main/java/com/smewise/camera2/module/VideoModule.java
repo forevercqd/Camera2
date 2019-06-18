@@ -282,6 +282,7 @@ public class VideoModule extends CameraModule implements FileSaver.FileListener,
         @Override
         public void resetTouchToFocus() {
             if (stateEnabled(Controller.CAMERA_MODULE_RUNNING)) {
+                Log.d(TAG, "cqd, resetTouchToFocus, set RQ_FOCUS_MODE = CONTROL_AF_MODE_CONTINUOUS_PICTURE");
                 mSession.applyRequest(Session.RQ_FOCUS_MODE,
                         CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
             }
