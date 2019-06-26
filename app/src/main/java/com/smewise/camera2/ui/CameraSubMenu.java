@@ -35,6 +35,7 @@ public class CameraSubMenu extends CameraBaseMenu{
         int color = context.getResources().getColor(R.color.pop_window_bg);
         mPopWindow.setBackgroundDrawable(new ColorDrawable(color));
         mPopWindow.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+        mPopWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mPopWindow.setAnimationStyle(-1);
         mPopWindow.setOutsideTouchable(false);
     }
