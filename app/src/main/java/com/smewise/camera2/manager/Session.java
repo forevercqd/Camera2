@@ -12,6 +12,7 @@ import android.media.ImageReader;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.SizeF;
 import android.view.Surface;
 
 import com.smewise.camera2.Config;
@@ -70,11 +71,33 @@ public abstract class Session {
     public abstract void release();
 
 
+    public void calculateSensorAngle(CameraCharacteristics cc, String cameraID) {
+        // 获取摄像头广角角度
+        SizeF sensorSize = cc.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);
+        float[] focalLengths = cc.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
+
+        float w = 0.5f * sensorSize.getWidth();
+        float h = 0.5f * sensorSize.getHeight();
+        Log.d(TAG, "calculateSensorAngle, Camera " + cameraID + " has sensorSize == " + Float.toString(2.0f * w) + ", " + Float.toString(2.0f * h));
+        for (int focusId = 0; focusId < focalLengths.length; focusId++) {
+            float focalLength = focalLengths[focusId];
+            float horizonalAngle = (float) Math.toDegrees(2 * Math.atan(w / focalLength));
+            float verticalAngle = (float) Math.toDegrees(2 * Math.atan(h / focalLength));
+            Log.d(TAG, "calculateSensorAngle, Camera " + cameraID + "/f" + focusId + " has focalLength == " + Float.toString(focalLength));
+            Log.d(TAG, "calculateSensorAngle, horizonalAngle = " + Float.toString(horizonalAngle) + ", verticalAngle = " + Float.toString(verticalAngle));
+
+        }
+    }
+
+
     void initCharacteristics() {
         CameraManager manager = (CameraManager) appContext.getSystemService(Context.CAMERA_SERVICE);
         try {
             assert manager != null;
             characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
+            calculateSensorAngle(characteristics, cameraDevice.getId());
+
+
             Log.d(TAG, "cqd, initCharacteristics, get getCameraCharacteristics");
         } catch (CameraAccessException e) {
             Log.e(TAG, "getCameraCharacteristics error:" + e.getMessage());
@@ -110,17 +133,17 @@ public abstract class Session {
     void sendRepeatingRequest(CaptureRequest request,
                                       CameraCaptureSession.CaptureCallback callback, Handler handler) {
         try {
-            Log.d(TAG, "cqd.focus, cameraSession.setRepeatingRequest");
+            Log.d(TAG, "cqd.flash,　cameraSession.setRepeatingRequest");
             cameraSession.setRepeatingRequest(request, callback, handler);  // cqd.note 反复发送　TEMPLATE_PREVIEW 请求, 并且有　callback 监听该请求的回调结果;
         } catch (CameraAccessException | IllegalStateException e) {
-            Log.e(TAG, "send repeating request error:" + e.getMessage());
+            Log.e(TAG, "cqd, send repeating request error:" + e.getMessage());
         }
     }
 
     void sendCaptureRequest(CaptureRequest request,
                                     CameraCaptureSession.CaptureCallback callback, Handler handler) {
         try {
-            Log.d(TAG, "cqd.focus, sendCaptureRequest, cameraSession.capture triger focus");
+            Log.d(TAG, "cqd.flash, sendCaptureRequest");
             cameraSession.capture(request, callback, handler);
         } catch (CameraAccessException | IllegalStateException e) {
             Log.e(TAG, "send capture request error:" + e.getMessage());
@@ -130,10 +153,10 @@ public abstract class Session {
     void sendCaptureRequestWithStop(CaptureRequest request,
                             CameraCaptureSession.CaptureCallback callback, Handler handler) {
         try {
-            Log.d(TAG, "cqd, sendCaptureRequestWithStop, call cameraSession.stopRepeating();  cameraSession.abortCaptures();");
+            Log.d(TAG, "cqd.flash, sendCaptureRequestWithStop, call cameraSession.stopRepeating();  cameraSession.abortCaptures();");
             cameraSession.stopRepeating();  // cqd.note 实现停止捕获图像，即停止预览。
             cameraSession.abortCaptures();
-            Log.d(TAG, "cqd.focus, sendCaptureRequestWithStop, call cameraSession.capture triger focus");
+            Log.d(TAG, "cqd.flash, sendCaptureRequestWithStop, call cameraSession.capture");
             cameraSession.capture(request, callback, handler);
         } catch (CameraAccessException | IllegalStateException e) {
             Log.e(TAG, "send capture request error:" + e.getMessage());
