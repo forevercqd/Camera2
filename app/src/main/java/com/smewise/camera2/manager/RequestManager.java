@@ -112,26 +112,30 @@ public class RequestManager {
                 builder.set(CaptureRequest.CONTROL_AE_MODE,
                         CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH);
                 builder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_SINGLE);
+                Log.d(TAG, "cqd.flash, getFlashRequest, set CONTROL_AE_MODE = CONTROL_AE_MODE_ON_ALWAYS_FLASH, FLASH_MODE = FLASH_MODE_SINGLE");
                 break;
             case CameraSettings.FLASH_VALUE_OFF:
                 builder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
                 builder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
+                Log.d(TAG, "cqd.flash, getFlashRequest, set CONTROL_AE_MODE = CONTROL_AE_MODE_ON, FLASH_MODE = FLASH_MODE_OFF");
                 break;
             case CameraSettings.FLASH_VALUE_AUTO:
                 builder.set(CaptureRequest.CONTROL_AE_MODE,
                         CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
                 builder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_SINGLE);
+                Log.d(TAG, "cqd.flash, getFlashRequest, set CONTROL_AE_MODE = CONTROL_AE_MODE_ON_AUTO_FLASH, FLASH_MODE = FLASH_MODE_SINGLE");
                 break;
             case CameraSettings.FLASH_VALUE_TORCH:
                 builder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
                 builder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH);
+                Log.d(TAG, "cqd.flash, getFlashRequest, set CONTROL_AE_MODE = CONTROL_AE_MODE_ON, FLASH_MODE = FLASH_MODE_TORCH");
                 break;
             default:
                 Log.e(TAG, "error value for flash mode");
                 break;
         }
 
-        Log.d(TAG, "cqd, getFlashRequest, set FlashBuildRequest");
+        Log.d(TAG, "cqd.flash, getFlashRequest, set FlashBuildRequest");
         builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
         return builder.build();
     }
@@ -146,24 +150,30 @@ public class RequestManager {
                 builder.set(CaptureRequest.CONTROL_AE_MODE,
                         CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH);
                 builder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_SINGLE);
+                Log.d(TAG, "cqd.flash, applyFlashRequest, set CONTROL_AE_MODE = CONTROL_AE_MODE_ON_ALWAYS_FLASH, FLASH_MODE = FLASH_MODE_SINGLE");
                 break;
             case CameraSettings.FLASH_VALUE_OFF:
                 builder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
                 builder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
+                Log.d(TAG, "cqd.flash, applyFlashRequest, set CONTROL_AE_MODE = CONTROL_AE_MODE_ON, FLASH_MODE = FLASH_MODE_OFF");
                 break;
             case CameraSettings.FLASH_VALUE_AUTO:
                 builder.set(CaptureRequest.CONTROL_AE_MODE,
                         CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
                 builder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_SINGLE);
+                Log.d(TAG, "cqd.flash, applyFlashRequest, set CONTROL_AE_MODE = CONTROL_AE_MODE_ON_AUTO_FLASH, FLASH_MODE = FLASH_MODE_SINGLE");
                 break;
             case CameraSettings.FLASH_VALUE_TORCH:
                 builder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
                 builder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH);
+                Log.d(TAG, "cqd.flash, applyFlashRequest, set CONTROL_AE_MODE = CONTROL_AE_MODE_ON, FLASH_MODE = FLASH_MODE_TORCH");
                 break;
             default:
                 Log.e(TAG, "error value for flash mode");
                 break;
         }
+
+        Log.d(TAG, "cqd.flash, applyFlashRequest, set FlashBuildRequest");
     }
 
     /* ------------------------- private function------------------------- */

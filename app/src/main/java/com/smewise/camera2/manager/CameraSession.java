@@ -217,7 +217,7 @@ public class CameraSession extends Session {
         CaptureRequest request = mRequestMgr.getStillPictureRequest(
                 getCaptureBuilder(false, mImageReader.getSurface()), jpegRotation);
 
-        Log.d(TAG, "cqd, sendStillPictureRequest, afMode = " + afMode);
+        Log.d(TAG, "cqd.flash, sendStillPictureRequest, afMode = " + afMode);
         sendCaptureRequestWithStop(request, mCaptureCallback, mMainHandler);
     }
 
@@ -301,7 +301,7 @@ public class CameraSession extends Session {
         mImageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
             @Override
             public void onImageAvailable(ImageReader reader) {
-                Log.d(TAG, "cqd capture, OnImageAvailableListener, onImageAvailable begin.");
+                Log.d(TAG, "cqd.flash capture, OnImageAvailableListener, onImageAvailable begin.");
                 mCallback.onDataBack(getByteFromReader(reader), // cqd.note 此处的　mCallback　其实是 mRequestCallback;
                         reader.getWidth(), reader.getHeight());
                 Log.d(TAG, "cqd capture, OnImageAvailableListener, onImageAvailable end.");
@@ -350,7 +350,6 @@ public class CameraSession extends Session {
             super.onCaptureCompleted(session, request, result);
             updateAfState(result);
             processPreCapture(result);
-            Log.d(TAG, "cqd, mPreviewCallback, onCaptureCompleted, mCallback = " + mCallback);
             mCallback.onRequestComplete();
 //            Log.d(TAG, "cqd, onCaptureCompleted end.");
         }
@@ -429,8 +428,9 @@ public class CameraSession extends Session {
 
     private void triggerAECaptureSequence() {
         CaptureRequest.Builder builder = getPreviewBuilder();
-        builder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
-                CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+        builder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER, CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+
+        Log.d(TAG, "cqd.flash, triggerAECaptureSequence, set CONTROL_AE_PRECAPTURE_TRIGGER = CONTROL_AE_PRECAPTURE_TRIGGER_START");
         mState = STATE_WAITING_PRE_CAPTURE;
         sendCaptureRequest(builder.build(), mPreviewCallback, mMainHandler);
     }
@@ -441,7 +441,7 @@ public class CameraSession extends Session {
                 CaptureRequest.CONTROL_AF_TRIGGER_START);
         mState = STATE_WAITING_LOCK;
 
-        Log.d(TAG, "cqd.focus, build set and send CONTROL_AF_TRIGGER_START");
+        Log.d(TAG, "cqd.flash, triggerAFCaptureSequence, build set and send CONTROL_AF_TRIGGER_START");
         sendCaptureRequest(builder.build(), mPreviewCallback, mMainHandler);
     }
 
